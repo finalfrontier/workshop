@@ -1,0 +1,9 @@
+[submodule "addon/maps"]
+	path = addon/maps
+	url = https://github.com/finalfrontier/maps
+[submodule "addon/materials"]
+	path = addon/materials
+	url = https://github.com/finalfrontier/materials
+[submodule "addon/gamemodes/finalfrontier"]
+	path = addon/gamemodes/finalfrontier
+	url = https://github.com/finalfrontier/finalfrontier
