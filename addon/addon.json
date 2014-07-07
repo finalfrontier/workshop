@@ -1,0 +1,20 @@
+{
+    "title" : "Final Frontier",
+    "type"  : "gamemode",
+    "tags"  :
+    [
+        "fun", "roleplay"
+    ],
+
+    "ignore" :
+    [
+        "maps/vmf/*",
+        "*.fgd",
+        "*.md",
+        "*/LICENSE",
+        "*.git",
+        "*.gitattributes",
+        "*.gitignore",
+        "*.gitmodules"
+    ]
+}
