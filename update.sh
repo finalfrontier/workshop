@@ -14,9 +14,22 @@ git pull origin master
 
 cd "../../"
 
+if [ -n "$(git status -s | grep -E "^ *M +addon/")" ]
+then
+    echo ""
+    echo "# Submodule change(s) detected, committing..."
+    echo ""
 
+    git add "addon/*"
+    git commit -m "Updated submodules"
+    git push origin master
 
-HASH="$(git rev-parse HEAD)"
+    gmad create -folder "./addon/" -out "./finalfrontier.gma"
 
-echo "update -addon \"./finalfrontier.gma\" -id \"282752490\" -changes \"Updated to version https://github.com/finalfrontier/workshop/commit/${HASH}\""
-#gmpublish.exe update -addon "./finalfrontier.gma" -id "282752490" -changes "Updated to version https://github.com/finalfrontier/workshop/commit/$HASH"
+    HASH="$(git rev-parse HEAD)"
+    update -addon "./finalfrontier.gma" -id "282752490" -changes "Updated to commit https://github.com/finalfrontier/workshop/commit/${HASH}"
+else
+    echo ""
+    echo "# No changes found, aborting..."
+    echo ""
+fi
