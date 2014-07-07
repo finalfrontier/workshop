@@ -27,7 +27,7 @@ then
     gmad create -folder "./addon/" -out "./finalfrontier.gma"
 
     HASH="$(git rev-parse HEAD)"
-    update -addon "./finalfrontier.gma" -id "282752490" -changes "Updated to commit https://github.com/finalfrontier/workshop/commit/${HASH}"
+    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "Updated to commit https://github.com/finalfrontier/workshop/commit/${HASH}"
 else
     echo ""
     echo "# No changes found, aborting..."
