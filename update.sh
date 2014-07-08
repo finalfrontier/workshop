@@ -1,35 +1,62 @@
 #!/bin/bash
 
-cd "./addon/gamemodes/finalfrontier"
+CHANGEFILE="$(pwd)/changes.txt"
 
-git pull origin master
+echo -n "" >"$CHANGEFILE"
 
-cd "../../maps"
+function fetch_submodule_changes
+{
+    OLDDIR="$(pwd)"
+    NEWDIR="$1"
+    NAME="$2"
 
-git pull origin master
+    echo "# Searching for changes to ${NAME}..."
 
-cd "../materials"
+    cd "$NEWDIR"
 
-git pull origin master
+    OLDHEAD="$(git rev-parse HEAD)"
 
-cd "../../"
+    git fetch origin
 
-if [ -n "$(git status -s | grep -E "^ *M +addon/")" ]
+    NEWHEAD="$(git rev-parse origin/master)"
+
+    if [ "$OLDHEAD" != "$NEWHEAD" ]
+    then
+        echo "# Change to ${NAME} found."
+
+        echo "${NAME} changes:" >>"$CHANGEFILE"
+
+        git rev-list "HEAD..origin/master" --reverse "--format=format:* %s" \
+            | grep -Ev "(Merge branch)|(^commit [a-f0-9]{32})" \
+            >>"$CHANGEFILE"
+
+        echo "" >>"$CHANGEFILE"
+
+        git merge origin/master
+    else
+        echo "# No change to ${NAME} since last update."
+    fi
+
+    cd "$OLDDIR"
+}
+
+fetch_submodule_changes "./addon/gamemodes/finalfrontier" "Gamemode"
+fetch_submodule_changes "./addon/maps" "Map"
+fetch_submodule_changes "./addon/materials" "Material"
+
+if [ -n "$(cat ${CHANGEFILE})" ]
 then
-    echo ""
     echo "# Submodule change(s) detected, committing..."
-    echo ""
+
+    cat "$CHANGEFILE"
 
     git add "addon/*"
-    git commit -m "Updated submodules"
+    git commit -m "$(cat changes.txt)"
     git push origin master
 
     gmad create -folder "./addon/" -out "./finalfrontier.gma"
 
-    HASH="$(git rev-parse HEAD)"
-    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "Updated to commit https://github.com/finalfrontier/workshop/commit/${HASH}"
+    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat changes.txt)"
 else
-    echo ""
     echo "# No changes found, aborting..."
-    echo ""
 fi
