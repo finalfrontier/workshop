@@ -51,12 +51,12 @@ then
     cat "$CHANGEFILE"
 
     git add "addon/*"
-    git commit -m "$(cat changes.txt)"
+    git commit -m "$(cat ${CHANGEFILE})"
     git push origin master
 
     gmad create -folder "./addon/" -out "./finalfrontier.gma"
 
-    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat changes.txt)"
+    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat ${CHANGEFILE})"
 else
     echo "# No changes found, aborting..."
 fi
