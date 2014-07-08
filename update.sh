@@ -29,7 +29,7 @@ function fetch_submodule_changes
        
         SHORTURL="$(curl -i http://git.io/ -F "url=${LONGURL}" | grep 'Location: ' | sed 's/Location: //')"
 
-        echo "${NAME} changes (${SHORTURL}):" >>"$CHANGEFILE"
+        echo "${NAME} changes: ${SHORTURL}" >>"$CHANGEFILE"
 
         git rev-list "HEAD..origin/master" --reverse "--format=format:* %s" \
             | grep -Ev "(Merge branch)|(^commit [a-f0-9]{32})" \
@@ -37,7 +37,7 @@ function fetch_submodule_changes
 
         echo "" >>"$CHANGEFILE"
 
-        #git merge origin/master
+        git merge origin/master
     else
         echo "# No change to ${NAME} since last update."
     fi
@@ -59,13 +59,13 @@ echo "# Submodule change(s) detected, committing..."
 
 cat "$CHANGEFILE"
 
-#git add "addon/*"
-#git commit -m "$(cat ${CHANGEFILE})"
-#git push origin master
+git add "addon/*"
+git commit -m "$(cat ${CHANGEFILE})"
+git push origin master
 
-#gmad create -folder "./addon/" -out "./finalfrontier.gma"
+gmad create -folder "./addon/" -out "./finalfrontier.gma"
 
-#gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat ${CHANGEFILE})"
+gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat ${CHANGEFILE})"
 
 exit 0
 
