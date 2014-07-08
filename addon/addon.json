@@ -9,6 +9,7 @@
     "ignore" :
     [
         "maps/vmf/*",
+        "*/LICENSE",
         "*.fgd",
         "*.md",
         "*.git",
