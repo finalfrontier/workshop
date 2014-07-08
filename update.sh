@@ -1,6 +1,13 @@
 #!/bin/bash
 
 CHANGEFILE="$(pwd)/changes.txt"
+BITLYTOKEN="$1"
+
+if [ -z "$BITLYTOKEN" ]
+then
+    echo "# Bitly token required, aborting..."
+    exit 1
+fi
 
 echo -n "" >"$CHANGEFILE"
 
@@ -24,7 +31,13 @@ function fetch_submodule_changes
     then
         echo "# Change to ${NAME} found."
 
-        echo "${NAME} changes:" >>"$CHANGEFILE"
+        REMOTE="$(git remote -v | sed ':a;N;$!ba;s/[ \t]/\n/g' | grep -E 'https://github.com/finalfrontier/[a-z]+' | head -1)"
+        LONGURL="${REMOTE}/compare/${OLDHEAD}...${NEWHEAD}"
+        APIURL="https://api-ssl.bitly.com/v3/shorten?access_token=${BITLYTOKEN}&longUrl=${LONGURL}&domain=bit.ly&format=txt"
+
+        SHORTURL="$(curl "${APIURL}")"
+
+        echo "${NAME} changes (${SHORTURL}):" >>"$CHANGEFILE"
 
         git rev-list "HEAD..origin/master" --reverse "--format=format:* %s" \
             | grep -Ev "(Merge branch)|(^commit [a-f0-9]{32})" \
@@ -44,19 +57,22 @@ fetch_submodule_changes "./addon/gamemodes/finalfrontier" "Gamemode"
 fetch_submodule_changes "./addon/maps" "Map"
 fetch_submodule_changes "./addon/materials" "Material"
 
-if [ -n "$(cat ${CHANGEFILE})" ]
+if [ -z "$(cat ${CHANGEFILE})" ]
 then
-    echo "# Submodule change(s) detected, committing..."
-
-    cat "$CHANGEFILE"
-
-    git add "addon/*"
-    git commit -m "$(cat ${CHANGEFILE})"
-    git push origin master
-
-    gmad create -folder "./addon/" -out "./finalfrontier.gma"
-
-    gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat ${CHANGEFILE})"
-else
     echo "# No changes found, aborting..."
+    exit 1
 fi
+
+echo "# Submodule change(s) detected, committing..."
+
+cat "$CHANGEFILE"
+
+git add "addon/*"
+git commit -m "$(cat ${CHANGEFILE})"
+git push origin master
+
+gmad create -folder "./addon/" -out "./finalfrontier.gma"
+
+gmpublish update -addon "./finalfrontier.gma" -id "282752490" -changes "$(cat ${CHANGEFILE})"
+
+exit 0
