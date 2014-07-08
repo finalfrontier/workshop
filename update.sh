@@ -35,7 +35,7 @@ function fetch_submodule_changes
         LONGURL="${REMOTE}/compare/${OLDHEAD}...${NEWHEAD}"
         APIURL="https://api-ssl.bitly.com/v3/shorten?access_token=${BITLYTOKEN}&longUrl=${LONGURL}&domain=bit.ly&format=txt"
 
-        SHORTURL="$(curl "${APIURL}")"
+        SHORTURL="$(curl "${APIURL}" | sed 's/^.\{7\}//')"
 
         echo "${NAME} changes (${SHORTURL}):" >>"$CHANGEFILE"
 
