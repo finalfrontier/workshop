@@ -17,6 +17,7 @@ function fetch_submodule_changes
     OLDHEAD="$(git rev-parse HEAD)"
 
     git fetch origin
+    git submodule update
 
     NEWHEAD="$(git rev-parse origin/master)"
 
